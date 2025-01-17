@@ -94,7 +94,7 @@ window.onload = function () {
     player.playSequence(notes);
     setInterval(() => {
       player.playSequence(notes);
-    }, 6550);
+    }, 1100);
   };
 
   document.body.appendChild(button);
@@ -113,10 +113,10 @@ window.onload = function () {
 
   // the canvas width & height, snake x & y, and the apple x & y, all need to be a multiples of the grid size in order for collision detection to work
   // (e.g. 16 * 25 = 400)
-  var grid = 16;
-  var count = 0;
+  let grid = 16;
+  let count = 0;
 
-  var snake = {
+  let snake = {
     x: 160,
     y: 160,
 
@@ -130,7 +130,7 @@ window.onload = function () {
     // length of the snake. grows when eating an apple
     maxCells: 4,
   };
-  var apple = {
+  let apple = {
     x: 320,
     y: 320,
   };
@@ -199,7 +199,7 @@ window.onload = function () {
       }
 
       // check collision with all cells after this one (modified bubble sort)
-      for (var i = index + 1; i < snake.cells.length; i++) {
+      for (let i = index + 1; i < snake.cells.length; i++) {
         // snake occupies same space as a body part. reset game
         if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
           snake.x = 160;
