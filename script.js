@@ -1,44 +1,32 @@
 const notes = [
   {
     duration: 0.10344825,
-    durationTicks: 96,
     midi: 51,
-    name: "D#3",
-    ticks: 0,
     time: 0,
     velocity: 0.14960629921259844,
   },
   {
     duration: 0.31034475,
-    durationTicks: 288,
     midi: 49,
-    name: "C#3",
-    ticks: 96,
     time: 0.10344825,
     velocity: 0.14960629921259844,
   },
   {
     duration: 0.10344824999999999,
-    durationTicks: 96,
     midi: 51,
-    name: "D#3",
-    ticks: 192,
     time: 0.2068965,
     velocity: 0.14960629921259844,
   },
   {
     duration: 0.31034474999999995,
-    durationTicks: 288,
     midi: 51,
-    name: "D#3",
-    ticks: 192,
     time: 0.2068965,
     velocity: 0.14960629921259844,
   },
 ];
 
 function createNotePlayer() {
-  const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  const audioContext = new window.AudioContext();
 
   // Convert MIDI note to frequency
   function midiToFreq(midi) {
