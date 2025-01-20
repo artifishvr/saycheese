@@ -1,33 +1,18 @@
 window.onload = function () {
-  // Add embedded pixel font using SVG paths
-  const fontStyle = document.createElement("style");
-  fontStyle.textContent = `
-    @font-face {
-      font-family: 'PixelMono';
-      src: url("data:application/x-font-ttf;charset=utf-8;base64,AAEAAAALAIAAAwAwT1MvMg8SBawAAAC8AAAAYGNtYXABVQCpAAABHAAAAFRnYXNw//8AAQAAAG4AAAAIZnBnbZaw1QEAAAJ0AAABCGdseWYAAAAAAAAAqAAAAKgAAAAoAAAAKAAAACgAAAAoAAAAGAAAABQAAAAUAAAAFAAAABQAAAAUAAAAFAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAACgAAAAoAAAAKAAAACgAAAA==");
-    }
-    .pixel {
-      font-family: 'PixelMono', monospace;
-      font-size: 16px;
-      line-height: 1;
-      letter-spacing: 0;
-      white-space: pre;
-    }
-  `;
-  document.head.appendChild(fontStyle);
   // styles
+
   document.body.style =
-    "margin: 0; display: flex; justify-content: center; flex-direction: column;align-items: center;  height: 100vh; background-color:#18181b";
+    "display:flex;justify-content:center;flex-direction:column;align-items:center;height:100vh;background-color:#18181b; font-family: 'Courier New', monospace; overflow:hidden;";
 
   const header = document.createElement("h1");
-  header.className = "pixel";
+  header.className = "p";
   header.style = "color: #fafafa; text-align: center; font-size: 32px;";
   header.innerHTML = "QR Code Snake";
 
   const controls = document.createElement("p");
-  controls.className = "pixel";
+  controls.className = "p";
   controls.style = "color: #fafafa; text-align: center;";
-  controls.innerHTML = "MOVE [←↑↓→] PAUSE [SPACE]";
+  controls.innerHTML = "MOVE [←↑↓→] PAUSE [space]";
 
   const canvas = document.createElement("canvas");
   canvas.width = 400;
