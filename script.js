@@ -1,108 +1,54 @@
-const notes = [
-  {
-    duration: 0.10344825,
-    midi: 51,
-    time: 0,
-    velocity: 0.14960629921259844,
-  },
-  {
-    duration: 0.31034475,
-    midi: 49,
-    time: 0.10344825,
-    velocity: 0.14960629921259844,
-  },
-  {
-    duration: 0.10344824999999999,
-    midi: 51,
-    time: 0.2068965,
-    velocity: 0.14960629921259844,
-  },
-  {
-    duration: 0.31034474999999995,
-    midi: 51,
-    time: 0.2068965,
-    velocity: 0.14960629921259844,
-  },
-];
-
-function createNotePlayer() {
-  const audioContext = new window.AudioContext();
-
-  // Convert MIDI note to frequency
-  function midiToFreq(midi) {
-    return 440 * Math.pow(2, (midi - 69) / 12);
-  }
-
-  function playNote(midiNote, time, duration, velocity) {
-    const oscillator = audioContext.createOscillator();
-    const gainNode = audioContext.createGain();
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioContext.destination);
-
-    oscillator.type = "triangle";
-    oscillator.frequency.value = midiToFreq(midiNote);
-
-    const startTime = audioContext.currentTime + time;
-    const attackTime = 0.005;
-    const releaseTime = 0.015;
-
-    // Initialize gain at 0
-    gainNode.gain.setValueAtTime(0, startTime);
-    // Fade in
-    gainNode.gain.linearRampToValueAtTime(
-      velocity * 0.3,
-      startTime + attackTime
-    );
-    // Fade out
-    gainNode.gain.linearRampToValueAtTime(0, startTime + duration);
-
-    oscillator.start(startTime);
-    oscillator.stop(startTime + duration + releaseTime);
-  }
-  // Play the sequence
-  function playSequence(notes, offset = 0) {
-    notes.forEach((note) => {
-      playNote(note.midi, note.time + offset, note.duration, note.velocity);
-    });
-  }
-
-  return {
-    playSequence,
-    audioContext,
-  };
-}
-
 window.onload = function () {
-  const button = document.createElement("button");
-  button.textContent = "obligatory bad apple";
+  // Add embedded pixel font using SVG paths
+  const fontStyle = document.createElement("style");
+  fontStyle.textContent = `
+    @font-face {
+      font-family: 'PixelMono';
+      src: url("data:application/x-font-ttf;charset=utf-8;base64,AAEAAAALAIAAAwAwT1MvMg8SBawAAAC8AAAAYGNtYXABVQCpAAABHAAAAFRnYXNw//8AAQAAAG4AAAAIZnBnbZaw1QEAAAJ0AAABCGdseWYAAAAAAAAAqAAAAKgAAAAoAAAAKAAAACgAAAAoAAAAGAAAABQAAAAUAAAAFAAAABQAAAAUAAAAFAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAABgAAAAYAAAAGAAAACgAAAAoAAAAKAAAACgAAAA==");
+    }
+    .pixel {
+      font-family: 'PixelMono', monospace;
+      font-size: 16px;
+      line-height: 1;
+      letter-spacing: 0;
+      white-space: pre;
+    }
+  `;
+  document.head.appendChild(fontStyle);
+  // styles
+  document.body.style =
+    "margin: 0; display: flex; justify-content: center; flex-direction: column;align-items: center;  height: 100vh; background-color:#18181b";
 
-  button.onclick = function () {
-    const player = createNotePlayer();
-    player.playSequence(notes);
-    setInterval(() => {
-      player.playSequence(notes);
-    }, 1100);
-  };
+  const header = document.createElement("h1");
+  header.className = "pixel";
+  header.style = "color: #fafafa; text-align: center; font-size: 32px;";
+  header.innerHTML = "QR Code Snake";
 
-  document.body.appendChild(button);
-  // Create canvas element
+  const controls = document.createElement("p");
+  controls.className = "pixel";
+  controls.style = "color: #fafafa; text-align: center;";
+  controls.innerHTML = "MOVE [←↑↓→] PAUSE [SPACE]";
+
   const canvas = document.createElement("canvas");
   canvas.width = 400;
   canvas.height = 400;
   canvas.style.display = "block";
   canvas.style.margin = "auto";
+  canvas.style =
+    "border-radius: 5px; background-color: #09090b; box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.5);";
 
-  // Add canvas to document
+  document.body.appendChild(header);
   document.body.appendChild(canvas);
+  document.body.appendChild(controls);
 
-  // Get context for drawing
   const context = canvas.getContext("2d");
 
+  // game variables
   // the canvas width & height, snake x & y, and the apple x & y, all need to be a multiples of the grid size in order for collision detection to work
   // (e.g. 16 * 25 = 400)
-  let grid = 16;
+  const grid = 16;
   let count = 0;
+  let pause = false;
 
   let snake = {
     x: 160,
@@ -118,13 +64,11 @@ window.onload = function () {
     // length of the snake. grows when eating an apple
     maxCells: 4,
   };
-  let apple = {
+  const apple = {
     x: 320,
     y: 320,
   };
 
-  // get random whole numbers in a specific range
-  // @see https://stackoverflow.com/a/1527820/2124254
   function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   }
@@ -133,6 +77,9 @@ window.onload = function () {
   function loop() {
     requestAnimationFrame(loop);
 
+    if (pause) {
+      return;
+    }
     // slow game loop to 15 fps instead of 60 (60/15 = 4)
     if (++count < 4) {
       return;
@@ -204,30 +151,24 @@ window.onload = function () {
     });
   }
 
-  // listen to keyboard events to move the snake
+  // keyboard input
   document.addEventListener("keydown", function (e) {
-    // prevent snake from backtracking on itself by checking that it's
-    // not already moving on the same axis (pressing left while moving
-    // left won't do anything, and pressing right while moving left
-    // shouldn't let you collide with your own body)
+    if (e.key == " ") {
+      pause = !pause;
+    }
 
-    // left arrow key
-    if (e.which === 37 && snake.dx === 0) {
+    if (pause) return;
+
+    if (e.key == "ArrowLeft" && snake.dx === 0) {
       snake.dx = -grid;
       snake.dy = 0;
-    }
-    // up arrow key
-    else if (e.which === 38 && snake.dy === 0) {
-      snake.dy = -grid;
-      snake.dx = 0;
-    }
-    // right arrow key
-    else if (e.which === 39 && snake.dx === 0) {
+    } else if (e.key == "ArrowRight" && snake.dx === 0) {
       snake.dx = grid;
       snake.dy = 0;
-    }
-    // down arrow key
-    else if (e.which === 40 && snake.dy === 0) {
+    } else if (e.key == "ArrowUp" && snake.dy === 0) {
+      snake.dy = -grid;
+      snake.dx = 0;
+    } else if (e.key == "ArrowDown" && snake.dy === 0) {
       snake.dy = grid;
       snake.dx = 0;
     }
